@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Change to your preferred provider if necessary
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  password  String
+
+  // One-to-many relationship with Project (one user can have many projects)
+  projects  Project[]
+
+  // One-to-many relationship with Task (one user can have many tasks)
+  tasks     Task[]   @relation("UserTasks")
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Many-to-one relationship with User (many projects for one user)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+
+  // One-to-many relationship with Task (one project can have many tasks)
+  tasks       Task[]   @relation("ProjectTasks")
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  dueDate     DateTime
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Many-to-one relationship with Project (many tasks for one project)
+  projectId   Int
+  project     Project  @relation("ProjectTasks", fields: [projectId], references: [id])
+
+  // Many-to-one relationship with User (one task assigned to one user)
+  userId      Int
+  user        User     @relation("UserTasks", fields: [userId], references: [id])
+}
