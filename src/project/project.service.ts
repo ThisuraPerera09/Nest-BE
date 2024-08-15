@@ -57,12 +57,20 @@ export class ProjectService {
 
   async remove(id: number) {
     try {
+      // Delete all tasks associated with the project
+      await this.prisma.task.deleteMany({
+        where: { projectId: id },
+      });
+
+      // Delete the project
       const project = await this.prisma.project.delete({
         where: { id },
       });
+
       if (!project) {
         throw new NotFoundException('Project not found');
       }
+
       return project;
     } catch (error) {
       throw new InternalServerErrorException('Failed to delete project');

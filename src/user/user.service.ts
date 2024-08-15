@@ -48,7 +48,7 @@ export class UserService {
       });
 
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('User not found with that email');
       }
 
       return user;
